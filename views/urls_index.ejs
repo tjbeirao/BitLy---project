@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <title>TinyApp</title>
+</head>
+
+<body>
+    <h1>
+        LINKS
+    </h1>
+    <ul>
+        <% for (urlFound in urls) { %>
+            <li>
+                <%= urlFound + ": " + urls[urlFound] %>
+                <form method="POST" action="POST /urls/:id/delete">........................</form>
+            </li>
+            <% } %>
+    </ul>
+
+    <li>Shortened Urls
+        <a href=></a>
+    </li>
+
+
+
+</body>
+
+</html>
