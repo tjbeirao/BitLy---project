@@ -7,24 +7,17 @@
 </head>
 
 <body>
-    <h1>
-        LINKS
-    </h1>
+    <h1> Shorted links:  </h1>
     <ul>
         <% for (urlFound in urls) { %>
             <li>
-                <%= urlFound + ": " + urls[urlFound] %>
-                <form method="POST" action="POST /urls/:id/delete">........................</form>
+                <form method="POST" action="POST /urls/:id/delete"></form>
+                <b><%= urls[urlFound] %></b> is now: <b><i>tinyapp/<%= urlFound %></i></b>
+                <form method="POST" action="/urls/delete/<%= urlFound %>"><input type="submit" value="Delete"></form>
             </li>
             <% } %>
-    </ul>
+        </ul>
 
-    <li>Shortened Urls
-        <a href=></a>
-    </li>
-
-
-
-</body>
-
+        <p>If you want to create a new link -> <a href="/urls/new">click here</a></p>
+    </body>
 </html>
