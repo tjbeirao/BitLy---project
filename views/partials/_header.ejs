@@ -1,7 +1,17 @@
 <html lang="en">
 
 <header>
-
+    <% if (!username) { %>
+    <form action="/urls/login" method="POST">
+    <input id="username" type="text" name="username" placeholder="Username" style="width: 300px">
+    <input type="submit" value="Update">
+    </form>
+    <% } else { %>
 </header>
-
+    <body>
+    <h1> Welcome <%= username %> !! <form action="/urls/logoff" method="POST"></h1>
+    <h2> If you want to logoff: <input type="submit" value="Logoff"></h2>
+    </form>
+    <% } %>
+    </body>
 </html>
