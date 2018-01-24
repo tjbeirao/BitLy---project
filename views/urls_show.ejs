@@ -11,7 +11,15 @@
         Shorted Link:
     </h1>
     <p>
-        The link for <b><%= urls[shortURL] %></b> is now: <b><l>tinyapp/<%= shortURL %></b></l>
+        The link for <b><%= urls[shortURL] %></b> is: <b><l>tinyapp/<%= shortURL %></b></l>
     </p>
+
+    <p> Type the new website for <b><l>tinyapp/<%= shortURL %></b></l>: 
+    
+    <form action="/urls/<%= shortURL %>" method="POST">
+    <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
+    <input type="submit" value="Update"></p>
+    </form>
+
 </body>
 </html>

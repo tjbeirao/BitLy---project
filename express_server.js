@@ -7,7 +7,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 function generateShortUrl() {
-    const vocabulary = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z'];
+    const vocabulary = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
     let output = "";
     for (let i = 0; i < 6; i++) {
         let index = getRandomInt();
@@ -18,21 +18,20 @@ function generateShortUrl() {
 
 function getRandomInt() {
     min = Math.ceil(0);
-    max = Math.floor(25);
-    return Math.floor(Math.random() * (25 - 0)) + 0;
+    max = Math.floor(35);
+    return Math.floor(Math.random() * (35 - 0)) + 0;
 }
 
-function removeItem(website) {
+function removeItem(id) {
     for (let index in urlDatabase) {
-        if (index == website) {
+        if (index == id) {
             delete urlDatabase[index]
         }
     }
 }
 
 var urlDatabase = {
-    "b2xVn2": "http://www.lighthouselabs.ca",
-    "9sm5xK": "http://www.google.com"
+
 };
 
 app.get("/", (req, res) => {
@@ -59,10 +58,21 @@ app.get("/urls/:id", (req, res) => {
     res.render("urls_show", templateVars);
 });
 
+app.post("/urls/:id", (req, res) => {
+    let newURL = req.params.id;
+    urlDatabase[newURL] = req.body.longURL;
+    res.redirect("/urls");
+});
+
+app.post("/urls/edit/:id", (req, res) => {
+    let templateVars = { shortURL: req.params.id, urls: urlDatabase };
+    res.render("urls_show", templateVars);
+});
+
 app.post("/urls/delete/:id", (req, res) => {
-    let id = urlFound;
+    let id = req.params.id;
     removeItem(id);
-    res.redirect("/urls")
+    res.redirect("/urls");
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -71,37 +81,14 @@ app.get("/u/:shortURL", (req, res) => {
     res.redirect(longURL);
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}!`);
 });
 
-// app.get("/hello", (req, res) => {
-//     res.end("<html><body>Hello <b>World</b></body></html>\n");
-// });
+app.get("/hello", (req, res) => {
+    res.end("<html><body>Hello <b>World</b></body></html>\n");
+});
 
-// app.get("/urls.json", (req, res) => {
-//     res.json(urlDatabase);
-// });
+app.get("/urls.json", (req, res) => {
+    res.json(urlDatabase);
+});
