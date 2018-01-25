@@ -2,12 +2,14 @@
 
 <header>
     <% if (!username) { %>
-        <p>To register a login --> -> <a href="/urls/register">click here</a></p>
+    <p><a href="/urls/login/acess"><input type="submit" value="LOG-IN"></a>
+    <a href="/urls/register"><input type="submit" value="REGISTER"></a></p>
     <% } else { %>
 </header>
     <body>
-    <h1> Welcome <%= username %> !! <form action="/urls/logoff" method="POST"></h1>
-    <p> If you want to logoff: <input type="submit" value="Logoff"></p>
+    <h1>Welcome       <%= username %>          :DDDDDDDDD</h1>
+    <h2><form action="/urls/logoff" method="POST"></h2>
+    <p><input type="submit" value="LOGOFF"></p>
     </form>
     <% } %>
     </body>
