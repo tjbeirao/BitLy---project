@@ -2,11 +2,15 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const PORT = process.env.PORT || 8080; // default port 8080
-var cookieParser = require('cookie-parser')
+const morgan = require('morgan')
 
-app.use(cookieParser())
+var cookieParser = require('cookie-parser')
+app.use(cookieParser('s4bt56s465s1b65s54tb6s54tb65s4bts'))
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
+
+
+
 
 function generateShortUrl() {
     const vocabulary = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
@@ -34,8 +38,17 @@ function removeItem(id) {
 
 function addUser(user, email, password) {
     let newUserKey = generateShortUrl()
-    console.log(newUserKey)
     users[newUserKey] = { id: user, email: email, password: password }
+}
+
+function addURL(longURL) {
+    if (longURL.charAt(0) === "h" && longURL.charAt(8) === "w") {
+        return longURL;
+    } else if (longURL.charAt(0) === "w" && longURL.charAt(1) === "w" && longURL.charAt(2) === "w") {
+        return longURL = ("http://" + longURL)
+    } else if (longURL.charAt(0) !== "h" && longURL.charAt(8) !== "w") {
+        return longURL = ("http://www." + longURL)
+    }
 }
 
 var urlDatabase = {};
@@ -52,6 +65,7 @@ var users = {
         password: "kira"
     }
 }
+
 
 app.post("/urls/login", (req, res) => {
     res.cookie("username", req.body.username);
@@ -74,10 +88,18 @@ app.post("/urls/register", (req, res) => {
     let newUserID = req.body.user;
     let newUserEmail = req.body.email;
     let newUserPassword = req.body.password;
-    addUser(newUserID, newUserEmail, newUserPassword);
-    res.redirect("/urls");
+    if (!req.body.user || !req.body.email || !req.body.password) {
+        res.redirect("/urls/error/400");
+    } else {
+        addUser(newUserID, newUserEmail, newUserPassword);
+        res.cookie("username", newUserID, newUserEmail);
+        res.redirect("/urls");
+    }
 })
 
+app.get("/urls/error/400", (req, res) => {
+    res.render("urls_error_400");
+});
 
 app.get("/", (req, res) => {
     res.redirect("/urls/new")
@@ -92,7 +114,8 @@ app.get("/urls", (req, res) => {
 
 app.post("/urls", (req, res) => {
     var shortURL = generateShortUrl();
-    urlDatabase[shortURL] = req.body.longURL
+    let newLongUrl = addURL(req.body.longURL)
+    urlDatabase[shortURL] = newLongUrl
     res.redirect("/urls");
 });
 
@@ -145,4 +168,4 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls.json", (req, res) => {
     res.json(urlDatabase);
-});
+})

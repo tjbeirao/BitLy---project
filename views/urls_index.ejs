@@ -13,7 +13,7 @@
     <ul>
         <% for (urlFound in urls) { %>
             <li>
-                <b><%= urls[urlFound] %></b> is now: <b><i>tinyapp/<%= urlFound %></i></b>
+                <b><%= urls[urlFound] %></b> is now: <b><i> <a href="/u/<%= urlFound %>">tinyapp/<%= urlFound %></a></i> </b>
                 <form method="POST" action="/urls/edit/<%= urlFound %>"><input type="submit" value="Edit"></form>
                 <form method="POST" action="/urls/delete/<%= urlFound %>"><input type="submit" value="Delete"></form>
             </li>
