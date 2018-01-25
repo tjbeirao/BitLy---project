@@ -32,26 +32,63 @@ function removeItem(id) {
     }
 }
 
+function addUser(user, email, password) {
+    let newUserKey = generateShortUrl()
+    console.log(newUserKey)
+    users[newUserKey] = { id: user, email: email, password: password }
+}
+
 var urlDatabase = {};
+
+var users = {
+    "919das": {
+        id: "tjbeirao",
+        email: "tjbeirao@gmail.com",
+        password: "kira"
+    },
+    "g4s98d": {
+        id: "mary",
+        email: "marylamarq@hotmail.com",
+        password: "kira"
+    }
+}
 
 app.post("/urls/login", (req, res) => {
     res.cookie("username", req.body.username);
     res.redirect("/urls");
 });
 
+
 app.post("/urls/logoff", (req, res) => {
     res.clearCookie("username");
     res.redirect("/urls");
 });
 
-app.get("/", (req, res) => {
-    res.redirect('/urls/new')
+
+app.get("/urls/register", (req, res) => {
+    res.render("urls_register");
 });
+
+
+app.post("/urls/register", (req, res) => {
+    let newUserID = req.body.user;
+    let newUserEmail = req.body.email;
+    let newUserPassword = req.body.password;
+    addUser(newUserID, newUserEmail, newUserPassword);
+    res.redirect("/urls");
+})
+
+
+app.get("/", (req, res) => {
+    res.redirect("/urls/new")
+});
+
 
 app.get("/urls", (req, res) => {
     let templateVars = { urls: urlDatabase, username: req.cookies["username"] };
     res.render("urls_index", templateVars);
 });
+
 
 app.post("/urls", (req, res) => {
     var shortURL = generateShortUrl();
@@ -59,14 +96,17 @@ app.post("/urls", (req, res) => {
     res.redirect("/urls");
 });
 
+
 app.get("/urls/new", (req, res) => {
     res.render("urls_new");
 });
+
 
 app.get("/urls/:id", (req, res) => {
     let templateVars = { shortURL: req.params.id, urls: urlDatabase, username: req.cookies["username"] };
     res.render("urls_show", templateVars);
 });
+
 
 app.post("/urls/:id", (req, res) => {
     let newURL = req.params.id;
@@ -74,11 +114,12 @@ app.post("/urls/:id", (req, res) => {
     res.redirect("/urls");
 });
 
+
 app.post("/urls/edit/:id", (req, res) => {
     let templateVars = { shortURL: req.params.id, urls: urlDatabase, username: req.cookies["username"] };
-    // username: req.cookies["username"],
     res.render("urls_show", templateVars);
 });
+
 
 app.post("/urls/delete/:id", (req, res) => {
     let id = req.params.id;
@@ -86,11 +127,13 @@ app.post("/urls/delete/:id", (req, res) => {
     res.redirect("/urls");
 });
 
+
 app.get("/u/:shortURL", (req, res) => {
     let shortURL = req.params.shortURL
     let longURL = urlDatabase[shortURL]
     res.redirect(longURL);
 });
+
 
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}!`);
