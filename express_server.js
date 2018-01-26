@@ -6,12 +6,16 @@ const morgan = require('morgan')
 const bcrypt = require('bcrypt');
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
-
+// var cookieSession = require('cookie-session')
 
 const cookieParser = require('cookie-parser')
-    // var cookieSession = require('cookie-session')
-    // app.use(cookieParser('my_super_secret_key'))
-app.use(cookieParser('s4bt56s465s1b65s54tb6s54tb65s4bts'))
+app.use(cookieParser('banana'))
+
+// app.use(cookieSession({
+//     name: 'id',
+//     keys: ["banana"],
+//     maxAge: 24 * 60 * 60 * 1000 // 24 hours
+// }))
 
 
 function generateShortUrl() {
@@ -54,7 +58,7 @@ function renameURL(longURL) {
 }
 
 function checkID(req, res) {
-    let current_user = req.cookies.id;
+    let current_user = res.cookie('current_user', users, { signed: true });;
     if (users[current_user]) {
         return true;
     } else {
@@ -65,7 +69,7 @@ function checkID(req, res) {
 function creatCookie(email, res) {
     for (let i in users) {
         if (users[i]["email"] == email) {
-            res.cookie("id", i);
+            res.cookie('current_user', users, { signed: true })
         }
     }
 }
@@ -104,9 +108,6 @@ app.post("/urls/register", (req, res) => {
     console.log(users)
 });
 
-
-
-
 const urlDatabase = {};
 
 const users = {
@@ -129,7 +130,7 @@ app.get("/", (req, res) => {
 
 
 app.get("/urls", (req, res) => {
-    let current_user = req.cookies.id;
+    let current_user = res.cookie('current_user', '', { signed: true });
     if (checkID(req, res)) {
         let templateVars = {
             'websites': urlDatabase,
@@ -144,7 +145,7 @@ app.get("/urls", (req, res) => {
 
 
 app.post("/urls", (req, res) => {
-    let current_user = req.cookies.id;
+    let current_user = res.cookie('current_user', '', { signed: true });
     let shortURL = generateShortUrl();
     let newLongUrl = renameURL(req.body.longURL)
     if (checkID(req, res)) {
@@ -184,34 +185,6 @@ app.get("/urls/register", (req, res) => {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 app.post("/urls/logoff", (req, res) => {
     res.clearCookie("id");
     res.redirect("/urls");
@@ -229,7 +202,11 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
     if (checkID(req, res)) {
-        let templateVars = { shortURL: req.params.id, urls: urlDatabase, username: req.cookies["id"] };
+        let templateVars = {
+            shortURL: req.params.id,
+            urls: urlDatabase,
+            username: res.cookie('current_user', '', { signed: true })
+        };
         res.render("urls_show", templateVars);
     } else {
         res.redirect("/urls/login/acess");
@@ -244,7 +221,11 @@ app.post("/urls/:id", (req, res) => {
 
 
 app.post("/urls/edit/:id", (req, res) => {
-    let templateVars = { shortURL: req.params.id, urls: urlDatabase, username: req.cookies["id"] };
+    let templateVars = {
+        shortURL: req.params.id,
+        urls: urlDatabase,
+        username: res.cookie('current_user', '', { signed: true })
+    };
     res.render("urls_show", templateVars);
 });
 
