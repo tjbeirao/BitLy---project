@@ -183,7 +183,7 @@ app.get("/urls/:id", (req, res) => {
         let templateVars = {
             shortURL: req.params.id,
             urls: urlDatabase,
-            username: req.session.current_user
+            username: checkID(req, res)
         };
         res.render("urls_show", templateVars);
     } else {
@@ -193,7 +193,7 @@ app.get("/urls/:id", (req, res) => {
 
 app.post("/urls/:id", (req, res) => {
     let newURL = req.params.id;
-    urlDatabase[newURL] = req.body.longURL;
+    urlDatabase[newURL]["website"] = req.body.longURL;
     res.redirect("/urls");
 });
 
@@ -201,7 +201,7 @@ app.post("/urls/edit/:id", (req, res) => {
     let templateVars = {
         shortURL: req.params.id,
         urls: urlDatabase,
-        username: req.session.current_user
+        username: checkID(req, res)
     };
     res.render("urls_show", templateVars);
 });
@@ -218,7 +218,7 @@ app.post("/urls/delete/:id", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
     let shortURL = req.params.shortURL
-    let longURL = urlDatabase[shortURL]
+    let longURL = urlDatabase[shortURL]["website"]
     res.redirect(longURL);
 });
 
