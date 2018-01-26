@@ -2,16 +2,14 @@
 <html lang="en">
 
 <head>
+    <% include partials/_header %>
     <title>TinyApp</title>
 </head>
 
 <body>
-    <h1>
-        Shorted Link:
-    </h1>
-    <p>
-        The link for <b><%= urls[shortURL] %></b> is: <b><l>tinyapp/<%= shortURL %></b></l>
-    </p>
+    <h1>Shorted Link:</h1>
+    
+    <p>The link for <b><%= urls[shortURL] %></b> is: <b><l>tinyapp/<%= shortURL %></b></l></p>
 
     <p> Type the new website for <b><l>tinyapp/<%= shortURL %></b></l>: 
     

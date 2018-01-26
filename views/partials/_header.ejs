@@ -1,16 +1,17 @@
 <html lang="en">
 
 <header>
-    <% if (!username) { %>
+    <% if (!user) { %>
     <p><a href="/urls/login/acess"><input type="submit" value="LOG-IN"></a>
     <a href="/urls/register"><input type="submit" value="REGISTER"></a></p>
     <% } else { %>
 </header>
-    <body>
-    <h1>Welcome       <%= username %>          :DDDDDDDDD</h1>
+
+<body>
+    <h1>Welcome        :DDDDDDDDD</h1>
     <h2><form action="/urls/logoff" method="POST"></h2>
     <p><input type="submit" value="LOGOFF"></p>
     </form>
     <% } %>
-    </body>
+</body>
 </html>

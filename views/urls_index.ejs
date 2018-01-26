@@ -2,22 +2,23 @@
 
 <html lang="en">
 
-<% include partials/_header %>
-
 <head>
+    <% include partials/_header %>
     <title>TinyApp</title>
 </head>
 
 <body>
     <h1> Shorted links: </h1>
     <ul>
-        <% for (urlFound in urls) { %>
+        <% for (urlFound in websites) { %>
+            <%  if (websites[urlFound]["by"] == current_user) { %>
             <li>
-                <b><%= urls[urlFound] %></b> is now: <b><i> <a href="/u/<%= urlFound %>">tinyapp/<%= urlFound %></a></i> </b>
-                <form method="POST" action="/urls/edit/<%= urlFound %>"><input type="submit" value="Edit"></form>
-                <form method="POST" action="/urls/delete/<%= urlFound %>"><input type="submit" value="Delete"></form>
+                <b><%= websites[urlFound]["website"] %></b> is now: <b><i> <a href="/u/<%= urlFound %>">tinyapp/<%= urlFound %></a></i> </b>
+                <p><form method="POST" action="/urls/edit/<%= urlFound %>"><input type="submit" value="Edit"></form>
+                <form method="POST" action="/urls/delete/<%= urlFound %>"><input type="submit" value="Delete"></form></p>
             </li>
-            <% } %>
+            <% } } %>
+            <p> You dont have any website on your user</p>
     </ul>
     <p>If you want to create a new link -> <a href="/urls/new">click here</a></p>
 </body>

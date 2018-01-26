@@ -1,21 +1,19 @@
 <html lang="en">
 
+    <header>
+        <p>Please, create a new user</p>
+    </header>
 
-<header>
-    <p>Please, create a new user</p>
-</header>
+    <body>
+        <form action="/urls/register" method="POST">
+            <input id="user" type="text" name="user" placeholder="user" style="width: 200px"></p>
 
-<body>
-    <form action="/urls/register" method="POST">
-    <input id="user" type="text" name="user" placeholder="user" style="width: 200px"></p>
+            <p><input type="email" name="email" placeholder="email" style="width: 200px"></p>
 
-    <form action="/urls/register" method="POST">
-    <p><input type="email" name="email" placeholder="email" style="width: 200px"></p>
+            <p><input id="password" type="password" name="password" placeholder="password" style="width: 200px"></p>
 
-    <form action="/urls/register" method="POST">
-    <p><input id="password" type="password" name="password" placeholder="password" style="width: 200px"></p>
+            <input type="submit" value="Create">
+        </form>
 
-    <input type="submit" value="Create">
-    </form>
-
-</body>
+    </body>
+</html>
