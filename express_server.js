@@ -6,17 +6,17 @@ const morgan = require('morgan')
 const bcrypt = require('bcrypt');
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
-// var cookieSession = require('cookie-session')
+var cookieSession = require('cookie-session')
 
-const cookieParser = require('cookie-parser')
-app.use(cookieParser('banana'))
+app.use(cookieSession({
+    name: 'session',
+    keys: ['key1', 'key2'],
+    maxAge: 24 * 60 * 60 * 1000
+}))
 
-// app.use(cookieSession({
-//     name: 'id',
-//     keys: ["banana"],
-//     maxAge: 24 * 60 * 60 * 1000 // 24 hours
-// }))
+const urlDatabase = {};
 
+const users = {};
 
 function generateShortUrl() {
     const vocabulary = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
@@ -58,79 +58,30 @@ function renameURL(longURL) {
 }
 
 function checkID(req, res) {
-    let current_user = res.cookie('current_user', users, { signed: true });;
-    if (users[current_user]) {
-        return true;
-    } else {
-        return false;
+    let current_user = req.session.current_user
+    for (let i in users) {
+        if (users[i]["email"] === current_user) {
+            return true;
+        }
+
     }
+    return false;
 }
 
-function creatCookie(email, res) {
+function creatCookie(email, req, res) {
     for (let i in users) {
         if (users[i]["email"] == email) {
-            res.cookie('current_user', users, { signed: true })
+            req.session.current_user = users[i]['email'];
         }
     }
 }
-
-app.post("/urls/login/acess", (req, res) => {
-    let emailInput = req.body.email;
-    let passInput = req.body.password;
-    for (let i in users) {
-        if (users[i]["email"] === emailInput && bcrypt.compareSync(passInput, users[i]['password'])) {
-            creatCookie(emailInput, res);
-            res.redirect("/urls/")
-            return;
-        }
-    }
-    res.clearCookie("id");
-    res.redirect("/urls/login/acess");
-})
-
-app.post("/urls/register", (req, res) => {
-    let newUserID = req.body.user;
-    let newUserEmail = req.body.email;
-    let hashedPassword = bcrypt.hashSync(req.body.password, 10);
-    for (let i in users) {
-        if (newUserEmail === users[i]['email']) {
-            res.clearCookie("id");
-            res.redirect("/urls/login/acess");
-            return;
-        } else if (!newUserID || !newUserEmail || !hashedPassword) {
-            res.redirect("/urls/error/400");
-            return;
-        }
-    }
-    addUser(newUserID, newUserEmail, hashedPassword);
-    creatCookie(newUserEmail, res);
-    res.redirect("/urls");
-    console.log(users)
-});
-
-const urlDatabase = {};
-
-const users = {
-    "919das": {
-        id: "tjbeirao",
-        email: "tjbeirao@gmail.com",
-        password: "kira"
-    },
-    "g4s98d": {
-        id: "mary",
-        email: "marylamarq@hotmail.com",
-        password: "kira"
-    }
-}
-
 
 app.get("/", (req, res) => {
     res.redirect("/urls/login/acess")
 });
 
-
 app.get("/urls", (req, res) => {
-    let current_user = res.cookie('current_user', '', { signed: true });
+    let current_user = req.session.current_user
     if (checkID(req, res)) {
         let templateVars = {
             'websites': urlDatabase,
@@ -143,9 +94,8 @@ app.get("/urls", (req, res) => {
     }
 });
 
-
 app.post("/urls", (req, res) => {
-    let current_user = res.cookie('current_user', '', { signed: true });
+    let current_user = req.session.current_user
     let shortURL = generateShortUrl();
     let newLongUrl = renameURL(req.body.longURL)
     if (checkID(req, res)) {
@@ -159,37 +109,66 @@ app.post("/urls", (req, res) => {
     }
 });
 
-
 app.get("/urls/login/acess", (req, res) => {
     res.render("urls_login");
 })
-
 
 app.post("/urls/login/acess", (req, res) => {
     let userEmail = req.body.email;
     let userPassword = req.body.password;
     for (let i in users) {
         if (users[i]["email"] === userEmail) {
-            creatCookie(userEmail, res);
+            creatCookie(userEmail, req, res);
             res.redirect("/urls/")
             return;
         }
     }
-    res.clearCookie("id");
+    req.session = null;
     res.redirect("/urls/login/acess");
 })
 
+app.post("/urls/login/acess", (req, res) => {
+    let emailInput = req.body.email;
+    let passInput = req.body.password;
+    for (let i in users) {
+        if (users[i]["email"] === emailInput && bcrypt.compareSync(passInput, users[i]['password'])) {
+            creatCookie(emailInput, req, res);
+            res.redirect("/urls/")
+            return;
+        }
+    }
+    req.session = null;
+    res.redirect("/urls/login/acess");
+})
 
 app.get("/urls/register", (req, res) => {
     res.render("urls_register");
 });
 
-
-app.post("/urls/logoff", (req, res) => {
-    res.clearCookie("id");
+app.post("/urls/register", (req, res) => {
+    let newUserID = req.body.user;
+    let newUserEmail = req.body.email;
+    let hashedPassword = bcrypt.hashSync(req.body.password, 10);
+    for (let i in users) {
+        if (newUserEmail === users[i]['email']) {
+            // res.clearCookie("id");
+            req.session = null;
+            res.redirect("/urls/login/acess");
+            return;
+        } else if (!newUserID || !newUserEmail || !hashedPassword) {
+            res.redirect("/urls/error/400");
+            return;
+        }
+    }
+    addUser(newUserID, newUserEmail, hashedPassword);
+    creatCookie(newUserEmail, req, res);
     res.redirect("/urls");
 });
 
+app.post("/urls/logoff", (req, res) => {
+    req.session = null;
+    res.redirect("/urls");
+});
 
 app.get("/urls/new", (req, res) => {
     if (checkID(req, res)) {
@@ -199,13 +178,12 @@ app.get("/urls/new", (req, res) => {
     }
 });
 
-
 app.get("/urls/:id", (req, res) => {
     if (checkID(req, res)) {
         let templateVars = {
             shortURL: req.params.id,
             urls: urlDatabase,
-            username: res.cookie('current_user', '', { signed: true })
+            username: req.session.current_user
         };
         res.render("urls_show", templateVars);
     } else {
@@ -219,16 +197,14 @@ app.post("/urls/:id", (req, res) => {
     res.redirect("/urls");
 });
 
-
 app.post("/urls/edit/:id", (req, res) => {
     let templateVars = {
         shortURL: req.params.id,
         urls: urlDatabase,
-        username: res.cookie('current_user', '', { signed: true })
+        username: req.session.current_user
     };
     res.render("urls_show", templateVars);
 });
-
 
 app.post("/urls/delete/:id", (req, res) => {
     if (checkID(req, res)) {
@@ -240,13 +216,11 @@ app.post("/urls/delete/:id", (req, res) => {
     }
 });
 
-
 app.get("/u/:shortURL", (req, res) => {
     let shortURL = req.params.shortURL
     let longURL = urlDatabase[shortURL]
     res.redirect(longURL);
 });
-
 
 app.get("/urls/error/400", (req, res) => {
     if (checkID(req, res)) {
@@ -263,59 +237,3 @@ app.get("/urls.json", (req, res) => {
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}!`);
 });
-
-
-
-
-
-
-
-
-
-
-
-// app.post("/urls", (req, res) => {
-//     let current_user = req.cookies.id;
-//     let shortURL = generateShortUrl();
-//     let newLongUrl = renameURL(req.body.longURL)
-//     if (checkID(req, res)) {
-//         urlDatabase[shortURL] = newLongUrl
-//         res.redirect("/urls")
-//     } else {
-//         res.redirect("/urls/login/acess");
-//     }
-//     console.log(urlDatabase)
-// });
-
-
-
-
-
-
-
-// app.get("/hello", (req, res) => {
-//     res.end("<html><body>Hello <b>World</b></body></html>\n");
-// });
-
-
-
-// function logIn(email, password) {
-//     for (let i in users) {
-//         if (email == users[i]['email'] && password == users[i]['password']) {
-//             res.redirect("/urls");
-//         } else if (email !== users[i]['email']) {
-//             alert("Wrong email")
-//             res.redirect("/urls/login/acess");
-//         } else if (password == users[i]['password']) {
-//             alert("Wrong password")
-//             res.redirect("/urls/login/acess");
-//         }
-//     }
-// }
-
-
-
-// app.post("/urls/login", (req, res) => {
-//     res.cookie("username", req.body.username);
-//     res.redirect("/urls");
-// });
