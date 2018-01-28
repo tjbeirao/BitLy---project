@@ -52,6 +52,8 @@ function renameURL(longURL) {
         return longURL;
     } else if (longURL.charAt(0) === "w" && longURL.charAt(1) === "w" && longURL.charAt(2) === "w") {
         return longURL = ("http://" + longURL)
+    } else if (longURL.charAt(0) === "h" && longURL.charAt(1) === "t" && longURL.charAt(7) !== "w" && longURL.charAt(8) !== "w") {
+        return longURL = longURL.replace("http://", "http://www.");
     } else if (longURL.charAt(0) !== "h" && longURL.charAt(8) !== "w") {
         return longURL = ("http://www." + longURL)
     }
